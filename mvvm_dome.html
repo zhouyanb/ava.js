@@ -1,41 +1,54 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>mvvm</title>
-        <script src="向晚.js"></script>
-    </head>
-    <body>
-        <div id='data1'>
-            <p a-text='name'></p>
-            <p a-text='person.age'></p>
-            <p>{{ person.name }} -- {{ person.age }}</p>
-            <input type="text" a-model='person.name'>
-            <button a-on:click="aclick">button</button>
-            <button @click='aclick'>button</button>
-            <input a-bind:style="ty">
-        </div>
-        <script>
-            var app = new ava({
-                id:'data1',
-                data:{
-                   name:'zyb',
-                   person:{
-                       name:'zyb',
-                       age:20
-                   },
-                   ty:{
-                       width:'500px'
-                   }
-                },
-                methods:{
-                    aclick(){
-                        console.log(this.name)
-                        this.name = 'cw';
-                    }
-                }
-            });
 
-        </script>
-    </body>
+<head>
+    <meta charset="utf-8">
+    <title>mvvm</title>
+    <script src="向晚.js"></script>
+</head>
+
+<body>
+    <div id='data1'>
+        <p a-text='name'></p>
+        <p a-text='person.age'></p>
+        <p>{{ person.name }} -- {{ person.age }}</p>
+        <input type="text" a-model='person.name'>
+        <button a-on:click="aclick">button</button>
+        <button @click='aclick'>button</button>
+        <input a-bind:style="ty">
+        if(show){
+            <div>{{ name }}</div>
+        } else if(_show) {
+            <div>{{ person.name }}</div>
+        } else {
+            <div>{{ person.age }}</div>
+        }
+        <!-- <div>{{ person.age }}</div> -->
+    </div>
+    <script>
+        var app = new ava({
+            id: 'data1',
+            data: {
+                name: 'cw',
+                person: {
+                    name: 'zyb',
+                    age: 20
+                },
+                ty: {
+                    width: '500px'
+                },
+                show:true,
+                _show:true
+            },
+            methods: {
+                aclick() {
+                    console.log(this.name)
+                    this.name = 'cw';
+                }
+            }
+        });
+
+    </script>
+</body>
+
 </html>
