@@ -88,8 +88,12 @@ var compileCommand = {
 function Compile(id, ava) {
     this.element = document.getElementById(id);
     this.ava = ava;
-    var start_if = false;
-    var start_else = false;
+    // var start_if = false;
+    // var start_else = false;
+    // var start_else_if = false;
+    var if_stack = [];
+    var if_h = -1;
+    var if_p = 0;
     var start_else_if = false;
     var if_content = '';
     var else_if_content = '';
@@ -97,6 +101,7 @@ function Compile(id, ava) {
     var fragment = nodeFragment(this.element);
     // 编译模板
     compile(fragment);
+    console.log(if_stack)
     this.element.appendChild(fragment);
     function nodeFragment(element) {
         // 创建文档碎片
@@ -119,15 +124,16 @@ function Compile(id, ava) {
         for (var i = 0; i < childlist.length; i++) {
             if (isNode(childlist[i])) {
                 // 是元素节点
-                if (start_if && !start_else) {
-                    if (start_else_if) {
+                if (if_stack.length != 0) {
+                    if (if_stack[if_h] === 'eif{') {
+                        start_else_if = true;
                         compileif(childlist[i], 'else_if')
-                    } else {
+                    } else if (if_stack[if_h] === 'if{') {
                         compileif(childlist[i], 'if')
+                    } else if (if_stack[if_h] === 'else{') {
+                        compileif(childlist[i], 'else')
                     }
-                } else if (start_else) {
-                    compileif(childlist[i], 'else')
-                } else {
+                }  else {
                     compileNode(childlist[i])
                     if (childlist[i].childNodes && childlist[i].childNodes.length) {
                         compile(childlist[i])
@@ -169,26 +175,37 @@ function Compile(id, ava) {
         }
     }
     function select_if(element, content) {
+        var boolean = true;
         var re_else = /\}\s*(else)\s*\{/
         var re_else_if = /\}\s*(else)\s*(if\(.+\))\s*\{/
+        if(content.startsWith('}')){
+            if_stack.push('}')
+            if_stack.splice(if_p,1)
+            if_stack.splice(if_h,1)
+            if_p -= 1;
+            if_h -= 1;
+            if(content === '}'){
+                element.remove(true)
+            }
+        }
         if (content.startsWith('if')) {
-            start_if = true;
+            if_stack.push('if{')
+            if_h += 1;
+            if_p += 1;
             if_content = content;
             element.remove(true)
         }
         if (re_else_if.test(content)) {
-            start_else_if = true;
+            if_stack.push('eif{')
+            if_h += 1;
+            if_p += 1;
             else_if_content = content;
             element.remove(true)
         }
         if (re_else.test(content)) {
-            start_else = true;
-            element.remove(true)
-        }
-        if (content === '}') {
-            start_if = false;
-            start_else = false;
-            start_else_if = false;
+            if_stack.push('else{')
+            if_h += 1;
+            if_p += 1;
             element.remove(true)
         }
     }
@@ -220,12 +237,15 @@ function Compile(id, ava) {
                 }
             })
         } else if (type === 'else') {
-            show = !show
             if (start_else_if) {
                 var __arg = _arg;
+                show = compileCommand.getvalue(_arg, ava);
+                console.log('hi')
+                start_else_if = false;
             } else {
                 var __arg = arg;
             }
+            show = !show
             new Watcher(ava, __arg, (newVal) => {
                 if (!newVal) {
                     element.style.display = '';

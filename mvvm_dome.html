@@ -9,7 +9,9 @@
 
 <body>
     <div id='data1'>
-        <p a-text='name'></p>
+        if(show){
+            <span>{{ name }}</span>
+        }
         <p a-text='person.age'></p>
         <p>{{ person.name }} -- {{ person.age }}</p>
         <input type="text" a-model='person.name'>
@@ -17,6 +19,12 @@
         <button @click='aclick'>button</button>
         <input a-bind:style="ty">
         if(show){
+            <div>{{ name }}</div>
+            if(s_show){
+                <div>{{ school }}</div>
+            } else {
+                <div>{{ person.age }}</div>
+            }
             <div>{{ name }}</div>
         } else if(_show) {
             <div>{{ person.name }}</div>
@@ -30,6 +38,7 @@
             id: 'data1',
             data: {
                 name: 'cw',
+                school:'jsu',
                 person: {
                     name: 'zyb',
                     age: 20
@@ -38,7 +47,8 @@
                     width: '500px'
                 },
                 show:true,
-                _show:true
+                _show:false,
+                s_show:true
             },
             methods: {
                 aclick() {
